@@ -6,9 +6,10 @@ let isConnected = false;
 export const connectToDB = async () => {
   mongoose.set('strictQuery', true);
 
-  if (!process.env.MONGO_URI) {
-    console.log('Missing MongoDB URI');
-    return;
+  const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
+
+  if (!uri) {
+    throw new Error('Missing MongoDB URI. Please set MONGO_URI or MONGODB_URI in your environment variables.');
   }
 
   // If already connected, return early
@@ -19,7 +20,7 @@ export const connectToDB = async () => {
 
   try {
     console.log('Establishing new MongoDB connection...');
-    await mongoose.connect(process.env.MONGO_URI, {
+    await mongoose.connect(uri, {
       // Best practices for serverless environments
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
